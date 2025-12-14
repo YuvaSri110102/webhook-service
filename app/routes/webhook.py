@@ -41,12 +41,15 @@ def receive_webhook(
         conn.commit()
         is_new = True
 
-    except Exception:
+    except UniqueViolation:
         conn.rollback()
-        
+
+    except Exception as e:
+        conn.rollback()
+        print("DB error:", e)
+
     finally:
         cur.close()
-        conn.close()
         release_db_connection(conn)
 
     if is_new:
