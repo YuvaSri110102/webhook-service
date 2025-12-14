@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException
-from app.db import conn
+from app.db import conn, get_db_connection
 
 router = APIRouter()
 
 @router.get("/transactions/{transaction_id}")
 def get_transaction_status(transaction_id: str):
     try:
+        conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(
             """
@@ -19,7 +20,8 @@ def get_transaction_status(transaction_id: str):
 
         row = cur.fetchone()
         cur.close()
-
+        conn.close()
+        
         if not row:
             raise HTTPException(status_code=404, detail="Transaction not found")
 

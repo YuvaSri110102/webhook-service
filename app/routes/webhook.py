@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, BackgroundTasks
 from pydantic import BaseModel
 from psycopg2.errors import UniqueViolation
-from app.db import conn
+from app.db import conn, get_db_connection
 from app.workers import process_transaction
 
 router = APIRouter()
@@ -18,6 +18,7 @@ def receive_webhook(
     payload: TransactionWebhook,
     background_tasks: BackgroundTasks
 ):
+    conn = get_db_connection()
     cur = conn.cursor()
     is_new = False
 
@@ -45,6 +46,7 @@ def receive_webhook(
         
     finally:
         cur.close()
+        conn.close()
 
     if is_new:
         background_tasks.add_task(

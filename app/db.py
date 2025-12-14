@@ -6,11 +6,8 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if not DATABASE_URL:
-    raise Exception("DATABASE_URL is not set")
-
-conn = psycopg2.connect(DATABASE_URL)
-
-cur = conn.cursor()
-cur.execute("select 1") 
-print("DB connected successfully")
+def get_db_connection():
+    return psycopg2.connect(
+        DATABASE_URL,
+        sslmode="require"
+    )
