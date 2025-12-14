@@ -1,11 +1,11 @@
 import time
 from datetime import datetime
-from app.db import conn
+from app.db import get_db_connection
 
 def process_transaction(transaction_id: str):
     try:
         time.sleep(30)
-
+        conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(
             """
@@ -18,6 +18,7 @@ def process_transaction(transaction_id: str):
         )
         conn.commit()
         cur.close()
+        conn.close()
 
     except Exception as e:
         print(f"Worker error for {transaction_id}: {e}")
