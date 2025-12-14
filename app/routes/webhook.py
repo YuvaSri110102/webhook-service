@@ -39,13 +39,13 @@ def receive_webhook(
         )
         conn.commit()
         is_new = True
-    except UniqueViolation:
+
+    except Exception:
         conn.rollback()
-        # Duplicate webhook → ignore
+        
     finally:
         cur.close()
 
-    # 🔥 Trigger background processing ONLY for new transactions
     if is_new:
         background_tasks.add_task(
             process_transaction, payload.transaction_id
